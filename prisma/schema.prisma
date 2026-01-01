@@ -1,0 +1,320 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL") // Note the quotes around DATABASE_URL
+}
+
+model administrateur {
+  id                     Int      @id @default(autoincrement())
+  nom                    String
+  prenom                 String
+  email                  String   @unique(map: "Administrateur_email_key")
+  indicatifPaysTelephone String
+  telephone              Int
+  motDePasse             String
+  image                  String?
+  role                   String   @default("ADMIN")
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime
+  adresse                String?
+}
+
+model agent {
+  id                     Int            @id @default(autoincrement())
+  nom                    String
+  prenom                 String
+  email                  String         @unique(map: "Agent_email_key")
+  indicatifPaysTelephone String
+  telephone              Int
+  motDePasse             String
+  image                  String?
+  role                   String         @default("AGENT")
+  createdAt              DateTime       @default(now())
+  adresse                String?
+  commande               commande[]
+  document               document[]
+  facture                facture[]
+  notification           notification[]
+}
+
+model assistant {
+  id                     Int            @id @default(autoincrement())
+  nom                    String
+  prenom                 String
+  email                  String         @unique(map: "Assistant_email_key")
+  indicatifPaysTelephone String
+  telephone              Int
+  motDePasse             String
+  image                  String?
+  role                   String         @default("ASSISTANT")
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime
+  adresse                String?
+  commande               commande[]
+  facture                facture[]
+  notification           notification[]
+  reclamation            reclamation[]
+}
+
+model client {
+  id                     Int            @id @default(autoincrement())
+  nom                    String
+  prenom                 String
+  email                  String         @unique(map: "Client_email_key")
+  indicatifPaysTelephone String
+  telephone              Int
+  motDePasse             String
+  image                  String?
+  role                   String         @default("CLIENT")
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @default(now())
+  adresse                String?
+  commande               commande[]
+  facture                facture[]
+  notification           notification[]
+  paiement               paiement[]
+  reclamation            reclamation[]
+}
+
+model commande {
+  id                             Int        @id @default(autoincrement())
+  clientId                       Int
+  assistantId                    Int?
+  agentId                        Int?
+  nom                            String
+  pays                           String
+  adresse                        String
+  dateDePickup                   DateTime
+  valeurMarchandise              Float
+  typeCommande                   String
+  typeTransport                  String
+  ecoterme                       String
+  modePaiement                   String
+  nomDestinataire                String
+  paysDestinataire               String
+  adresseDestinataire            String
+  indicatifTelephoneDestinataire String
+  telephoneDestinataire          Int
+  emailDestinataire              String
+  statut                         String     @default("En attente")
+  adresseActuel                  String?
+  dateCommande                   DateTime   @default(now())
+  createdAt                      DateTime   @default(now())
+  updatedAt                      DateTime
+  dateArrivage                   String
+  notes                          String     @db.LongText
+  agent                          agent?     @relation(fields: [agentId], references: [id], map: "Commande_agentId_fkey")
+  assistant                      assistant? @relation(fields: [assistantId], references: [id], map: "Commande_assistantId_fkey")
+  client                         client     @relation(fields: [clientId], references: [id], map: "Commande_clientId_fkey")
+  document                       document[]
+  facture                        facture[]
+  produit                        produit[]
+
+  @@index([agentId], map: "Commande_agentId_fkey")
+  @@index([assistantId], map: "Commande_assistantId_fkey")
+  @@index([clientId], map: "Commande_clientId_fkey")
+}
+
+model document {
+  id         Int      @id @default(autoincrement())
+  idAgent    Int
+  nom        String
+  size       Float
+  url        String
+  type       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime
+  statut     String   @default("À valider")
+  commandeId Int
+  commande   commande @relation(fields: [commandeId], references: [id], map: "Document_commandeId_fkey")
+  agent      agent    @relation(fields: [idAgent], references: [id], map: "Document_idAgent_fkey")
+
+  @@index([commandeId], map: "Document_commandeId_fkey")
+  @@index([idAgent], map: "Document_idAgent_fkey")
+}
+
+model facture {
+  id            Int        @id @default(autoincrement())
+  idCommande    Int
+  idClient      Int
+  idAgent       Int?
+  document      String?
+  numeroFacture Int        @unique(map: "Facture_numeroFacture_key")
+  montant       Float
+  dateEmission  DateTime
+  status        String     @default("En attente")
+  assistantId   Int?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime
+  assistant     assistant? @relation(fields: [assistantId], references: [id], map: "Facture_assistantId_fkey")
+  agent         agent?     @relation(fields: [idAgent], references: [id], map: "Facture_idAgent_fkey")
+  client        client     @relation(fields: [idClient], references: [id], map: "Facture_idClient_fkey")
+  commande      commande   @relation(fields: [idCommande], references: [id], map: "Facture_idCommande_fkey")
+  paiement      paiement?
+
+  @@index([assistantId], map: "Facture_assistantId_fkey")
+  @@index([idAgent], map: "Facture_idAgent_fkey")
+  @@index([idClient], map: "Facture_idClient_fkey")
+  @@index([idCommande], map: "Facture_idCommande_fkey")
+}
+
+model notification {
+  id           Int        @id @default(autoincrement())
+  dateEmission DateTime   @default(now())
+  type         String
+  correspond   String
+  lu           Boolean    @default(false)
+  clientId     Int?
+  assistantId  Int?
+  agentId      Int?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime
+  agent        agent?     @relation(fields: [agentId], references: [id], map: "Notification_agentId_fkey")
+  assistant    assistant? @relation(fields: [assistantId], references: [id], map: "Notification_assistantId_fkey")
+  client       client?    @relation(fields: [clientId], references: [id], map: "Notification_clientId_fkey")
+
+  @@index([agentId], map: "Notification_agentId_fkey")
+  @@index([assistantId], map: "Notification_assistantId_fkey")
+  @@index([clientId], map: "Notification_clientId_fkey")
+}
+
+model paiement {
+  id           Int       @id @default(autoincrement())
+  idFacture    Int       @unique(map: "Paiement_idFacture_key")
+  clientId     Int
+  modePaiement String
+  statut       String    @default("En attente")
+  datePaiement DateTime?
+  montant      Float
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime
+  client       client    @relation(fields: [clientId], references: [id], map: "Paiement_clientId_fkey")
+  facture      facture   @relation(fields: [idFacture], references: [id], map: "Paiement_idFacture_fkey")
+
+  @@index([clientId], map: "Paiement_clientId_fkey")
+}
+
+model paymentmethod {
+  id           String               @id
+  nom          String
+  description  String
+  frais        String
+  fraisFixe    String
+  statut       paymentmethod_statut
+  dateCreation DateTime
+  derniereMaj  DateTime
+}
+
+model produit {
+  id                  Int      @id @default(autoincrement())
+  idCommande          Int
+  nom                 String
+  categorie           String?
+  tarifUnitaire       Float
+  poids               Float
+  largeur             Float
+  longueur            Float
+  hauteur             Float
+  quantite            Int
+  typeConditionnement String
+  fragile             Boolean  @default(false)
+  description         String?  @db.Text
+  image               String?
+  document            String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime
+  commande            commande @relation(fields: [idCommande], references: [id], map: "Produit_idCommande_fkey")
+
+  @@index([idCommande], map: "Produit_idCommande_fkey")
+}
+
+model reclamation {
+  id          Int        @id @default(autoincrement())
+  idClient    Int
+  assistantId Int?
+  description String     @db.Text
+  documents   String?    @db.LongText
+  status      String     @default("Ouverte")
+  date        DateTime   @default(now())
+  sujet       String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime
+  response    String?    @db.Text
+  assistant   assistant? @relation(fields: [assistantId], references: [id], map: "Reclamation_assistantId_fkey")
+  client      client     @relation(fields: [idClient], references: [id], map: "Reclamation_idClient_fkey")
+
+  @@index([assistantId], map: "Reclamation_assistantId_fkey")
+  @@index([idClient], map: "Reclamation_idClient_fkey")
+}
+
+enum paymentmethod_statut {
+  actif
+  inactif
+}
+
+model shipment {
+  id                String              @id
+  trackingNumber    String              @unique(map: "Shipment_trackingNumber_key")
+  status            String
+  transportMode     String
+  origin            String
+  destination       String
+  departureDate     DateTime?
+  arrivalDate       DateTime?
+  estimatedArrival  DateTime?
+  distance          Float?
+  weight            Float?
+  volume            Float?
+  cost              Float?
+  region            String?
+  warehouseId       String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime
+  logisticsincident logisticsincident[]
+  warehouse         warehouse?          @relation(fields: [warehouseId], references: [id], map: "Shipment_warehouseId_fkey")
+
+  @@index([region], map: "Shipment_region_idx")
+  @@index([status], map: "Shipment_status_idx")
+  @@index([transportMode], map: "Shipment_transportMode_idx")
+  @@index([warehouseId], map: "Shipment_warehouseId_idx")
+}
+
+model warehouse {
+  id                String              @id
+  name              String
+  location          String
+  address           String?
+  capacity          Int
+  type              String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime
+  logisticsincident logisticsincident[]
+  shipment          shipment[]
+
+  @@index([location], map: "Warehouse_location_idx")
+  @@index([type], map: "Warehouse_type_idx")
+}
+
+model logisticsincident {
+  id          String     @id
+  type        String
+  description String?
+  severity    String
+  status      String
+  reportedAt  DateTime   @default(now())
+  resolvedAt  DateTime?
+  shipmentId  String?
+  warehouseId String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime
+  shipment    shipment?  @relation(fields: [shipmentId], references: [id], map: "LogisticsIncident_shipmentId_fkey")
+  warehouse   warehouse? @relation(fields: [warehouseId], references: [id], map: "LogisticsIncident_warehouseId_fkey")
+
+  @@index([shipmentId], map: "LogisticsIncident_shipmentId_idx")
+  @@index([status], map: "LogisticsIncident_status_idx")
+  @@index([type], map: "LogisticsIncident_type_idx")
+  @@index([warehouseId], map: "LogisticsIncident_warehouseId_idx")
+}

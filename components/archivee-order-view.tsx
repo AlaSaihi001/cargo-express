@@ -1,0 +1,284 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import { Archive, CheckCircle, FileText, MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { ProductDetailsDialog } from "@/components/product-details-dialog";
+
+// Define the ProductUI and Order interfaces
+
+interface ProductUI {
+  id?: number; // Local ID
+  nom: string;
+  categorie?: string;
+  tarifUnitaire: number;
+  poids: number;
+  largeur: number;
+  longueur: number;
+  hauteur: number;
+  quantite: number;
+  typeConditionnement: string;
+  fragile: boolean;
+  description?: string;
+  image?: string | File;
+  document?: string;
+}
+
+interface Order {
+  id: string;
+  nom: string;
+  pays: string;
+  adresse: string;
+  dateDePickup: string;
+  dateArrivage: string;
+  valeurMarchandise: number;
+  typeCommande: string;
+  typeTransport: string;
+  ecoterme: string;
+  modePaiement: string;
+  nomDestinataire: string;
+  paysDestinataire: string;
+  adresseDestinataire: string;
+  indicatifTelephoneDestinataire: string;
+  telephoneDestinataire: number;
+  emailDestinataire: string;
+  statut: string;
+  adresseActuel: string;
+  produits: ProductUI[];
+  factures: any[];
+  createdAt: string;
+  updatedAt: string;
+  notes: string[];
+}
+
+interface ArchiveeOrderViewProps {
+  order: Order; // Use the Order type from page.tsx
+}
+
+export function ArchiveeOrderView({ order }: ArchiveeOrderViewProps) {
+  const [selectedProduct, setSelectedProduct] = useState<ProductUI | null>(
+    null
+  );
+
+  if (!order) {
+    return <div>Données de commande non disponibles</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-xl font-semibold">
+          <div className="flex items-center justify-between">
+            <Badge
+              variant="outline"
+              className="bg-[#f3f4f6] text-[#1f2937] border-[#e5e7eb] flex items-center gap-1 px-3 py-1"
+            >
+              <Archive className="h-4 w-4" />
+              <span>Commande Archivée</span>
+            </Badge>
+          </div>
+        </h1>
+
+        <Button
+          variant="outline"
+          onClick={() => alert("Impression de la commande")}
+        >
+          Imprimer commande
+        </Button>
+      </div>
+
+      {/* Localisation & Suivi */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Localisation & Suivi</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex flex-col md:flex-row justify-between items-start">
+            <div className="text-center mb-4 md:mb-0">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-blue-500" />
+                <span className="font-medium text-blue-500">
+                  {order.adresse || "N/A"}
+                </span>
+              </div>
+              <div className="text-2xl font-bold mt-1">
+                {order.pays || "N/A"}
+              </div>
+              <div className="mt-2 text-sm text-gray-500">Date de départ</div>
+              <div className="font-medium">{order.dateDePickup || "N/A"}</div>
+            </div>
+
+            <div className="flex-1 px-8 mt-4 hidden md:block">
+              <div className="h-2 bg-green-100 rounded-full relative">
+                <div className="absolute inset-y-0 left-0 bg-green-600 rounded-full w-full" />
+              </div>
+            </div>
+
+            <div className="text-center">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-blue-500" />
+                <span className="font-medium text-blue-500">
+                  {order.adresseDestinataire || "N/A"}
+                </span>
+              </div>
+              <div className="text-2xl font-bold mt-1">
+                {order.paysDestinataire || "N/A"}
+              </div>
+              <div className="mt-2 text-sm text-gray-500">Date d'arrivée</div>
+              <div className="font-medium">{order.dateArrivage || "N/A"}</div>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
+            <div className="text-sm text-blue-700">
+              Position actuelle:{" "}
+              <span className="font-medium">{order.adresseActuel}</span>
+            </div>
+            <Button variant="outline" size="sm" className="text-blue-700">
+              Voir sur la carte
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Liste des Produits */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Produits</CardTitle>
+          <CardDescription>
+            Liste des produits de votre commande
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Image du produit</TableHead>
+                <TableHead>Nom de produit</TableHead>
+                <TableHead>Catégorie</TableHead>
+                <TableHead>Tarif (€)</TableHead>
+                <TableHead>Poids</TableHead>
+                <TableHead>Dimensions</TableHead>
+                <TableHead>Quantité</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {order.produits?.map((product) => (
+                <TableRow key={product.id}>
+                  <TableCell>
+                    <div className="w-12 h-12 bg-gray-200 rounded">
+                      {product.image && (
+                        <Image
+                          src={product.image || "/placeholder.svg"}
+                          alt={product.nom}
+                          width={48}
+                          height={48}
+                          className="rounded"
+                        />
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>{product.nom}</TableCell>
+                  <TableCell>{product.categorie}</TableCell>
+                  <TableCell>{product.tarifUnitaire}€</TableCell>
+                  <TableCell>{product.poids}</TableCell>
+                  <TableCell>
+                    {product.longueur}x{product.largeur}x{product.hauteur}
+                  </TableCell>
+                  <TableCell>{product.quantite}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setSelectedProduct(product)}
+                    >
+                      Détails
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Notes */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Notes</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {order.notes?.map((note, index) => (
+            <div key={index} className="flex items-start gap-2 text-blue-700">
+              <AlertTriangle className="h-5 w-5 shrink-0" />
+              <span>{note}</span>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Facture */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Facture</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button variant="outline" className="w-full">
+            <FileText className="mr-2 h-4 w-4" />
+            Télécharger la facture
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Support */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Support Client</CardTitle>
+        </CardHeader>
+        <CardContent className="flex items-center gap-4">
+          <Image
+            src="/placeholder.svg"
+            alt="Support Agent"
+            width={64}
+            height={64}
+            className="rounded-full"
+          />
+          <div>
+            <div className="font-medium">Samia Allagui</div>
+            <div className="text-sm text-gray-500">
+              <div>Numéro de Téléphone: +216 99 99 99 99</div>
+              <div>Email: support@cargo.com</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Product Details Dialog */}
+      {selectedProduct && (
+        <ProductDetailsDialog
+          isOpen={!!selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+          product={selectedProduct}
+        />
+      )}
+    </div>
+  );
+}
