@@ -145,7 +145,7 @@ export default function NewOrderPage() {
     }
 
     try {
-      const response = await fetch("/api/commandes", {
+      const response = await fetch("/api/client/commandes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -203,9 +203,6 @@ export default function NewOrderPage() {
     setDetails(updated);
   };
 
-
-
-  
   return (
     <div className="space-y-6">
       <div>

@@ -371,7 +371,7 @@ export function EnAttenteOrderView({
         </CardContent>
       </Card>
 
-      {/* 🛡 Produits */}
+      {/* 🛡 Produits
       <Card>
         <CardHeader>
           <CardTitle>Produits</CardTitle>
@@ -438,7 +438,7 @@ export function EnAttenteOrderView({
             </TableBody>
           </Table>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* 🛡 Informations importantes */}
       <Card>

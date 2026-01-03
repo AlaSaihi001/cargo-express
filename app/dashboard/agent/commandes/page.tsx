@@ -241,6 +241,9 @@ export default function CommandesPage() {
                 <SelectContent>
                   <SelectItem value="all">Tous les statuts</SelectItem>
                   <SelectItem value="En attente">En attente</SelectItem>
+                  <SelectItem value="Validée par l'assistant">
+                    Validée par l'assistant
+                  </SelectItem>
                   <SelectItem value="Validée">Acceptée</SelectItem>
                   <SelectItem value="refusee">Refusée</SelectItem>
                   <SelectItem value="expediee">Expédiée</SelectItem>

@@ -56,6 +56,8 @@ export async function POST(req: NextRequest) {
         valeurMarchandise: parseFloat(body.valeurMarchandise),
         telephoneDestinataire: parseInt(body.telephoneDestinataire),
         statut: "En attente",
+        updatedAt: new Date(),
+        dateArrivage: new Date(),
         adresseActuel: body.adresse,
         clientId: clientId,
         produits: {

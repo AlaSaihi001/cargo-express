@@ -104,7 +104,7 @@ model commande {
   dateCommande                   DateTime   @default(now())
   createdAt                      DateTime   @default(now())
   updatedAt                      DateTime
-  dateArrivage                   String
+  dateArrivage                   DateTime
   notes                          String     @db.LongText
   agent                          agent?     @relation(fields: [agentId], references: [id], map: "Commande_agentId_fkey")
   assistant                      assistant? @relation(fields: [assistantId], references: [id], map: "Commande_assistantId_fkey")

@@ -243,7 +243,7 @@ export class AgentService {
       const updatedCommande = await prisma.commande.update({
         where: { id: commandeId },
         data: {
-          statut: "Validée",
+          statut: "Acceptée",
           agentId: agentId,
         },
       });
@@ -252,7 +252,7 @@ export class AgentService {
         data: {
           clientId: updatedCommande.clientId,
           type: "Commande",
-          correspond: `Votre commande ${updatedCommande.nom} a été validée`,
+          correspond: `Votre commande ${updatedCommande.nom} a été acceptée`,
         },
       });
 
