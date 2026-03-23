@@ -420,7 +420,7 @@ export default function AgentDashboardPage() {
             >
               Expéditions
             </TabsTrigger>
-            
+
             <TabsTrigger
               value="factures"
               className="data-[state=active]:bg-[#074e6e] data-[state=active]:text-white"

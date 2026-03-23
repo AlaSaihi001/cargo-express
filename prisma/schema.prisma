@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL") // Note the quotes around DATABASE_URL
+  url      = env("DATABASE_URL")
 }
 
 model administrateur {
@@ -104,7 +104,7 @@ model commande {
   dateCommande                   DateTime   @default(now())
   createdAt                      DateTime   @default(now())
   updatedAt                      DateTime
-  dateArrivage                   DateTime
+  dateArrivage                   DateTime?
   notes                          String     @db.LongText
   agent                          agent?     @relation(fields: [agentId], references: [id], map: "Commande_agentId_fkey")
   assistant                      assistant? @relation(fields: [assistantId], references: [id], map: "Commande_assistantId_fkey")

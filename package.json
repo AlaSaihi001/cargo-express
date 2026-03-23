@@ -16,7 +16,7 @@
     "@huggingface/transformers": "^3.5.1",
     "@langchain/community": "^0.3.44",
     "@langchain/core": "^0.3.57",
-    "@prisma/client": "^6.19.1",
+    "@prisma/client": "^6.19.2",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.4",
     "@radix-ui/react-aspect-ratio": "^1.1.1",
@@ -68,7 +68,6 @@
     "nodemailer": "latest",
     "onnxruntime-web": "^1.22.0",
     "openai": "^4.103.0",
-    "prisma": "^6.19.1",
     "react": "^18.3.1",
     "react-day-picker": "latest",
     "react-dom": "^18.3.1",
@@ -100,6 +99,7 @@
     "langchain": "^0.3.29",
     "node-loader": "^2.1.0",
     "postcss": "^8",
+    "prisma": "^6.19.2",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
   }
